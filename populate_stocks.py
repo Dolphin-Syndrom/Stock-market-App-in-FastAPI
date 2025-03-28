@@ -18,7 +18,7 @@ symbols = [row['symbol'] for row in rows]
 for asset in assets:
     try:
         if asset.status == 'active' and asset.tradable:
-            cursor.execute("INSERT into stock (symbol, name) VALUES (?, ?)", (asset.symbol, asset.name))
+            cursor.execute("INSERT into stock (symbol, name, exchange) VALUES (?, ?, ?)", (asset.symbol, asset.name, asset.exchange))
     except Exception as e:
         print(asset.symbol)
         print(e)
