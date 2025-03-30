@@ -99,6 +99,16 @@ detail.html
   </div>
   <!-- TradingView Widget END -->
 
+<form method="post" action="/apply_strategy" class="mb-4">
+    <select name="strategy_id">
+        {% for strategy in strategies %}
+        <option value="{{strategy.id }}">{{strategy.name}}</option> 
+        {% endfor %}
+    </select>
+    <input type="text" name="stock_id" value="{{stock.id}}">
+    <input type="submit" value="Apply Strategy" class="btn btn-primary">
+</form>
+
         <div class="stock-table">
             <table class="table">
                 <thead>
