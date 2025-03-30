@@ -7,8 +7,19 @@ connection = sqlite3.connect(config.DB_FILE)
 connection.row_factory = sqlite3.Row
 cursor = connection.cursor()
 
-cursor.execute("""
-            SELECT id, symbol, name FROM stock
+if stock_filter == "new_intraday_highs":
+    cursor.execute("""
+            select * from(
+                SELECT s.id, s.symbol, s.name FROM stock s
+                JOIN stock_price sp ON s.id = sp.stock_id
+                WHERE sp.close >= sp.high
+                GROUP BY s.id, s.symbol, s.name
+                ORDER BY s.symbol
+                   ) where date = ?
+                """, (datetime.now().date(),)) 
+else:
+    cursor.execute("""
+            SELECT id, symbol, name FROM stock ORDER by symbol
                """)
 
 rows = cursor.fetchall()
@@ -34,7 +45,7 @@ for i in range(0, len(valid_symbols), chunk_size):
     try:
         barsets = api.get_bars(
             symbol_chunk,
-            TimeFrame.Hour,
+            TimeFrame.Day,
             start=start_date.strftime('%Y-%m-%d'),
             end=end_date.strftime('%Y-%m-%d'),
             adjustment='raw'
@@ -42,13 +53,13 @@ for i in range(0, len(valid_symbols), chunk_size):
         
         for bar in barsets:
             symbol = bar.S
-            print(f"Processing symbol {symbol} - Time: {bar.t}")
+            print(f"Processing symbol {symbol} - Date: {bar.t.date()}")
             
             stock_id = stock_dict[symbol]
-          
-            # Format datetime to include date 
-            timestamp = bar.t.strftime('%Y-%m-%d') if hasattr(bar.t, 'strftime') else str(bar.t)
-            
+
+            timestamp = bar.t.split('T')[0] if isinstance(bar.t, str) else bar.t.date()
+            print(f"Timestamp: {timestamp}")
+
             cursor.execute("""
                 INSERT INTO stock_price (stock_id, date, open, high, low, close, volume)
                 VALUES (?, ?, ?, ?, ?, ?, ?)

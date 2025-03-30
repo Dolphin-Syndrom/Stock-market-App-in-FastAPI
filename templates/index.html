@@ -59,9 +59,20 @@
     <div class="container stock-container">
         <div class="stock-header">
             <h1>Stock Market Dashboard</h1>
-            <p class="lead">Real-time stock market data and analytics</p>
+            <p class="lead">stock market data and analytics</p>
         </div>
         
+        <form method="get" class="d-flex  mb-4">
+            <select name="filter" class="form-select me-2" style="max-width: 300px; border-color: #0b3d91;">
+            <option value="" disabled selected>Select a filter</option>
+            <option value="new_intraday_highs">New Intraday Highs</option>
+            <option value="new_closing_highs">New Closing Highs</option>
+            <option value="new_intraday_lows">New Intraday Lows</option>
+            <option value="new_closing_lows">New Closing Lows</option>
+            </select> 
+            <input type="submit" value="Filter" class="btn btn-primary">
+        </form>
+
         <div class="stock-table">
             <table class="table">
                 <thead>
