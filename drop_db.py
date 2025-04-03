@@ -11,3 +11,11 @@ cursor.execute("""
 cursor.execute("""
                 DROP TABLE stock
                """)
+
+cursor.execute(""" 
+                DROP TABLE strategy
+""")
+
+cursor.execute("""
+                DROP TABLE strategy_stock
+""")
