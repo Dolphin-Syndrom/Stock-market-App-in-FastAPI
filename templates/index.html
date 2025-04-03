@@ -11,6 +11,133 @@
             background-color: whitesmoke;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark-mode .stock-header {
+            color: #66b3ff;
+        }
+
+        .dark-mode .stock-table {
+            background: #2d2d2d;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .table {
+            color: #ffffff;
+        }
+
+        .dark-mode .table tbody tr:hover {
+            background-color: #3d3d3d;
+        }
+
+        .dark-mode a {
+            color: #66b3ff;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #0b3d91;
+            background-color: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .theme-toggle {
+            border-color: #66b3ff;
+            color: #ffffff;
+        }
+
+        .theme-toggle:hover {
+            background-color: #0b3d91;
+            color: white;
+        }
+
+        .dark-mode .theme-toggle:hover {
+            background-color: #66b3ff;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 34px;
+            border-radius: 34px;
+            background-color: #ccc;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            border: none;
+        }
+
+        .theme-toggle .slider {
+            position: relative;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: white;
+            transition: transform 0.4s ease, background-color 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateX(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .theme-toggle .icon {
+            width: 16px;
+            height: 16px;
+            color: #f39c12;
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-toggle .moon-icon {
+            opacity: 0;
+            position: absolute;
+            color: #f1c40f;
+        }
+
+        .theme-toggle .sun-icon {
+            opacity: 1;
+        }
+
+        .dark-mode .theme-toggle {
+            background-color: #2c3e50;
+        }
+
+        .dark-mode .theme-toggle .slider {
+            transform: translateX(46px);
+            background-color: #34495e;
+        }
+
+        .dark-mode .theme-toggle .moon-icon {
+            opacity: 1;
+        }
+
+        .dark-mode .theme-toggle .sun-icon {
+            opacity: 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .theme-toggle:hover .slider {
+            animation: pulse 1s infinite;
+        }
         .stock-container {
             margin: 2rem auto;
             max-width: 1200px;
@@ -56,6 +183,16 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <div class="slider">
+            <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z" />
+            </svg>
+            <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" />
+            </svg>
+        </div>
+    </button>
     <div class="container stock-container">
         <div class="stock-header">
             <h1>Stock Market Dashboard</h1>
@@ -92,7 +229,24 @@
             </table>
         </div>
     </div>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            
+            // Save preference
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+        }
 
+        // Check for saved theme preference
+        window.addEventListener('load', () => {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
