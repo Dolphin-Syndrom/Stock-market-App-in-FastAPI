@@ -228,21 +228,21 @@
                         <td><a href="/stock/{{ stock.symbol }}">{{ stock.name }}</a></td>
                         <td class="price">
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].close %}
-                                {{ indicator_values[stock.symbol].close }}
+                                {{ indicator_values[stock.symbol].close | round(2) }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].rsi_14 %}
-                                {{ indicator_values[stock.symbol].rsi_14 }}
+                                {{ indicator_values[stock.symbol].rsi_14 | round(2)}}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].sma20 %}
-                                {{ indicator_values[stock.symbol].sma20 }}
+                                {{ indicator_values[stock.symbol].sma20 | round(2)}}
                             {% else %}
                                 -
                             {% endif %}
