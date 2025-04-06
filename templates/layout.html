@@ -175,6 +175,40 @@
             box-shadow: 0 2px 15px rgba(11, 61, 145, 0.1);
         }
         
+        /* Card styles for light and dark mode */
+        .card {
+            background-color: white;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .dark-mode .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Table header styles for light and dark mode */
+        .table-primary {
+            background-color: #0b3d91 !important;
+            color: white !important;
+        }
+        
+        .dark-mode .table-primary {
+            background-color: #1c3a70 !important;
+            color: white !important;
+        }
+        
+        /* Badge styles for dark mode */
+        .dark-mode .badge.bg-primary {
+            background-color: #3a6ac2 !important;
+        }
+        
+        /* Text color for info messages in dark mode */
+        .dark-mode .text-muted {
+            color: #a0a0a0 !important;
+        }
+        
         /* Dark mode overrides */
         .dark-mode .navbar {
             background-color: #1c1c1c;
@@ -243,7 +277,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-chart-line"></i> Quants
+                <i class="fas fa-chart-line"></i> Backtester
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -252,10 +286,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/stock"><i class="fas fa-chart-bar"></i> Stocks</a>
+                        <a class="nav-link" href="/"><i class="fas fa-chart-bar"></i> Stocks</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/strategies"><i class="fas fa-lightbulb"></i> Strategies</a>

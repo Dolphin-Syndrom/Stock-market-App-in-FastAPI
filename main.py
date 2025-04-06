@@ -3,7 +3,9 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from datetime import date, timedelta
-
+import ollama
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 
 app = FastAPI()
@@ -163,6 +165,79 @@ def apply_strategy(strategy_id: int = Form(...), stock_id: int = Form(...)):
 
     return RedirectResponse(url=f"/strategy/{strategy_id}", status_code=303)
 
+@app.get("/strategies")
+def strategies(request: Request):
+    connection = sqlite3.connect(config.DB_FILE)
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+
+    cursor.execute("""
+                SELECT id, name FROM strategy
+                """)
+
+    strategies = cursor.fetchall()
+
+    return templates.TemplateResponse("strategies.html", {"request": request, "strategies": strategies})
+
+    
+
+router = APIRouter()
+
+class FinancialQuery(BaseModel):
+    question: str
+
+def get_financial_advice(user_input):
+    prompt = f"""
+    You are a professional financial advisor specializing in stock market analysis.
+    Please address the following user query directly and precisely:
+    
+    "{user_input}"
+    
+    Focus only on what the user is specifically asking about. Do not add unrequested information.
+    If it's a straightforward question, give a direct answer without unnecessary sections.
+    
+    For complex questions about investments or market analysis, use this structure:
+    
+    1. Direct Answer: [Directly address the specific question asked]
+    2. Key Considerations: [Only relevant factors to the specific question]
+    3. Recommended Actions: [Specific to what was asked]
+    4. Brief Disclaimer: [Short investment disclaimer]
+    
+    Only provide advice related to stocks, investing, or financial markets.
+    If the question is not finance-related, politely decline to answer.
+    """
+
+    response = ollama.chat(
+        model="tinyllama",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an expert financial advisor. Answer exactly what is asked, nothing more and nothing less."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return response.get('message', {}).get('content', 'No response generated.')
+
+@router.post("/ai-agent")
+def financial_advice(query: FinancialQuery):
+    if not query.question.strip():
+        raise HTTPException(status_code=400, detail="Question cannot be empty.")
+        
+    try:
+        advice = get_financial_advice(query.question)
+        return {"advice": advice}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating advice: {str(e)}")
+
+@app.get("/ai-agent")
+def ai_agent_page(request: Request):
+    return templates.TemplateResponse("ai-agent.html", {"request": request})
+
 @app.get("/strategy/{strategy_id}")
 def strategy(request: Request, strategy_id):
     connection = sqlite3.connect(config.DB_FILE)
@@ -184,3 +259,5 @@ def strategy(request: Request, strategy_id):
     stocks = cursor.fetchall()
 
     return templates.TemplateResponse("strategy.html", {"request": request, "strategy": strategy, "stocks": stocks})
+
+app.include_router(router)

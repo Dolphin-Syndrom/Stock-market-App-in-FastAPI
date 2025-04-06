@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title %}
+
+<h1>Strategies</h1>
+
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="mb-4">
+            <h1 class="mb-0">Trading Strategies</h1>
+        </div>
+        
+        <div class="card shadow-sm bg-dark">
+            <div class="card-body p-0 stock-table">
+                <div class="table-responsive">
+                    <table class="table table-hover table-dark mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>ID</th>
+                                <th>Strategy Name</th>
+                                <th>Stocks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if strategies %}
+                                {% for strategy in strategies %}
+                                <tr>
+                                    <td>{{ strategy.id }}</td>
+                                    <td>
+                                        <a href="/strategy/{{ strategy.id }}" class="fw-bold text-decoration-none">
+                                            {{ strategy.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ strategy.stock_count if strategy.stock_count else 0 }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>No strategies found
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
