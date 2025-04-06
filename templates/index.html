@@ -241,14 +241,22 @@
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].rsi_14 %}
+<<<<<<< HEAD
                                 {{ indicator_values[stock.symbol].rsi_14 | round(2) }}
+=======
+                                {{ indicator_values[stock.symbol].rsi_14 | round(2)}}
+>>>>>>> bced740c1ec7162834d9f100f0d47805bbbaa7f0
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].sma20 %}
+<<<<<<< HEAD
                                 {{ indicator_values[stock.symbol].sma20 | round(2) }}
+=======
+                                {{ indicator_values[stock.symbol].sma20 | round(2)}}
+>>>>>>> bced740c1ec7162834d9f100f0d47805bbbaa7f0
                             {% else %}
                                 -
                             {% endif %}
