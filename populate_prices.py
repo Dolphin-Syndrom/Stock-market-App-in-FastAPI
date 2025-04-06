@@ -33,7 +33,7 @@ api = tradeapi.REST(config.API_KEY, config.SECRET_KEY, base_url=config.BASE_URL)
 valid_symbols = [symbol for symbol in symbols if "/" not in symbol]
 
 # 3 months to yesterday of daily data
-end_date = datetime.now() - timedelta(days=1)  # Yesterday
+end_date = datetime.now() - timedelta(days=10)  
 start_date = end_date - timedelta(days=90)  
 
 chunk_size = 200

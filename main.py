@@ -87,15 +87,36 @@ def index(request: Request):
                     """)
         
     rows = cursor.fetchall()
+    
     cursor.execute("""
-                SELECT symbol, rsi_14, sma20, sma50, close FROM stock join stock_price on stock.id = stock_price.stock_id
-                   WHERE date = ?
-                   """, (day_before_yesterday.isoformat(),))
+        SELECT date FROM stock_price
+        ORDER BY date DESC
+        LIMIT 1
+    """)
+    latest_date = cursor.fetchone()
+    
+    query_date = latest_date['date'] if latest_date else day_before_yesterday.isoformat()
+    
+
+    cursor.execute("""
+        SELECT sp.stock_id, s.symbol, sp.rsi_14, sp.sma20, sp.sma50, sp.close 
+        FROM stock_price sp
+        JOIN stock s ON sp.stock_id = s.id
+        WHERE sp.date = ?
+    """, (query_date,))
 
     indicator_rows = cursor.fetchall()
-    indicator_values = {row['symbol']: {"rsi_14": row["rsi_14"], "sma20": row["sma20"], "sma50": row["sma50"], "close": row["close"]} for row in indicator_rows}
-
     
+    indicator_values = {}
+    for row in indicator_rows:
+        indicator_values[row['symbol']] = {
+            "rsi_14": row["rsi_14"],
+            "sma20": row["sma20"],
+            "sma50": row["sma50"],
+            "close": row["close"]
+        }
+
+    print(f"Found {len(indicator_values)} stocks with indicator values")
 
     return templates.TemplateResponse("index.html", {"request": request, "stocks": rows, "indicator_values": indicator_values})
 
