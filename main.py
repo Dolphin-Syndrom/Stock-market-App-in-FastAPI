@@ -2,8 +2,9 @@ import sqlite3, config
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from datetime import date
-from datetime import timedelta
+from datetime import date, timedelta
+
+
 
 app = FastAPI()
 
@@ -16,9 +17,11 @@ def index(request: Request):
     connection = sqlite3.connect(config.DB_FILE)
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
+    
+    # Define day_before_yesterday at the beginning of the function
+    day_before_yesterday = date.today() - timedelta(days=2)
 
     if stock_filter == "new_closing_highs":
-        day_before_yesterday = date.today() - timedelta(days=2)
         cursor.execute("""
             select * from(
             SELECT symbol, name, stock_id, max(close), date
@@ -27,15 +30,32 @@ def index(request: Request):
                order by symbol
             ) where date = ?
             """, (day_before_yesterday.isoformat(),))
-        
+    elif stock_filter == "new_closing_lows":
+        cursor.execute("""
+            select * from(
+            SELECT symbol, name, stock_id, min(close), date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               group by stock_id
+               order by symbol
+            ) where date = ?
+            """, (day_before_yesterday.isoformat(),))
     else:
         cursor.execute("""
                     SELECT id, symbol, name FROM stock ORDER BY symbol 
                     """)
         
     rows = cursor.fetchall()
+    cursor.execute("""
+                SELECT symbol, rsi_14, sma20, sma50, close FROM stock join stock_price on stock.id = stock_price.stock_id
+                   WHERE date = ?
+                   """, (day_before_yesterday.isoformat(),))
 
-    return templates.TemplateResponse("index.html", {"request": request, "stocks": rows})
+    indicator_rows = cursor.fetchall()
+    indicator_values = {row['symbol']: {"rsi_14": row["rsi_14"], "sma20": row["sma20"], "sma50": row["sma50"], "close": row["close"]} for row in indicator_rows}
+
+    
+
+    return templates.TemplateResponse("index.html", {"request": request, "stocks": rows, "indicator_values": indicator_values})
 
 @app.get("/stock/{symbol}")
 def stock_detail(request: Request, symbol: str):

@@ -2,23 +2,20 @@ import sqlite3, config
 import alpaca_trade_api as tradeapi
 from alpaca_trade_api.rest import REST, TimeFrame
 from datetime import datetime, timedelta
+import tulipy, numpy
 
 connection = sqlite3.connect(config.DB_FILE)
 connection.row_factory = sqlite3.Row
 cursor = connection.cursor()
 
-if stock_filter == "new_intraday_highs":
-    cursor.execute("""
-            select * from(
-                SELECT s.id, s.symbol, s.name FROM stock s
-                JOIN stock_price sp ON s.id = sp.stock_id
-                WHERE sp.close >= sp.high
-                GROUP BY s.id, s.symbol, s.name
-                ORDER BY s.symbol
-                   ) where date = ?
-                """, (datetime.now().date(),)) 
-else:
-    cursor.execute("""
+# Before running this script, execute this SQL to add the columns if they don't exist:
+# cursor.execute("""
+#     ALTER TABLE stock_price ADD COLUMN sma20 REAL;
+#     ALTER TABLE stock_price ADD COLUMN sma50 REAL;
+#     ALTER TABLE stock_price ADD COLUMN rsi14 REAL;
+# """)
+
+cursor.execute("""
             SELECT id, symbol, name FROM stock ORDER by symbol
                """)
 
@@ -35,9 +32,9 @@ api = tradeapi.REST(config.API_KEY, config.SECRET_KEY, base_url=config.BASE_URL)
 
 valid_symbols = [symbol for symbol in symbols if "/" not in symbol]
 
-# Get dates for the last 5 trading days
+# 3 months to yesterday of daily data
 end_date = datetime.now() - timedelta(days=1)  # Yesterday
-start_date = end_date - timedelta(days=5)  # 5 days before
+start_date = end_date - timedelta(days=90)  
 
 chunk_size = 200
 for i in range(0, len(valid_symbols), chunk_size):
@@ -51,19 +48,47 @@ for i in range(0, len(valid_symbols), chunk_size):
             adjustment='raw'
         )
         
+        symbol_bars = {}
         for bar in barsets:
-            symbol = bar.S
-            print(f"Processing symbol {symbol} - Date: {bar.t.date()}")
+            if bar.S not in symbol_bars:
+                symbol_bars[bar.S] = []
+            symbol_bars[bar.S].append(bar)
             
+       
+        for symbol, bars in symbol_bars.items():
+            if symbol not in stock_dict:
+                continue
+                
             stock_id = stock_dict[symbol]
-
-            timestamp = bar.t.split('T')[0] if isinstance(bar.t, str) else bar.t.date()
-            print(f"Timestamp: {timestamp}")
-
-            cursor.execute("""
-                INSERT INTO stock_price (stock_id, date, open, high, low, close, volume)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (stock_id, timestamp, bar.o, bar.h, bar.l, bar.c, bar.v))
+            recent_closes = [bar.c for bar in bars]
+            
+            
+            sorted_bars = sorted(bars, key=lambda x: x.t)
+            
+            indicators_calculated = False
+            if len(recent_closes) >= 50:
+                sma20 = tulipy.sma(numpy.array(recent_closes), period=20)[-1]
+                sma50 = tulipy.sma(numpy.array(recent_closes), period=50)[-1]
+                rsi_14 = tulipy.rsi(numpy.array(recent_closes), period=14)[-1]
+                indicators_calculated = True
+                print(f"Latest indicators for {symbol} - SMA20: {sma20}, SMA50: {sma50}, RSI14: {rsi_14}")
+            else:
+                sma20, sma50, rsi_14 = None, None, None
+                
+            for i, bar in enumerate(sorted_bars):
+                timestamp = bar.t.date()
+                print(f"Processing symbol {symbol} - Date: {timestamp}")
+                
+                if i == len(sorted_bars) - 1 and indicators_calculated:
+                    cursor.execute("""
+                        INSERT INTO stock_price (stock_id, date, open, high, low, close, volume, sma20, sma50, rsi_14)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (stock_id, timestamp, bar.o, bar.h, bar.l, bar.c, bar.v, sma20, sma50, rsi_14))
+                else:
+                    cursor.execute("""
+                        INSERT INTO stock_price (stock_id, date, open, high, low, close, volume, sma20, sma50, rsi_14)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL)
+                    """, (stock_id, timestamp, bar.o, bar.h, bar.l, bar.c, bar.v))
             
     except tradeapi.rest.APIError as e:
         print(f"Error fetching data for symbols {symbol_chunk}: {e}")
