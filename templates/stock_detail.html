@@ -43,6 +43,21 @@
         .dark-mode a {
             color: #66b3ff;
         }
+        
+        .dark-mode .strategy-form {
+            background-color: #2d2d2d !important;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark-mode .strategy-form label {
+            color: #66b3ff !important;
+        }
+        
+        .dark-mode .strategy-form select {
+            background-color: #3d3d3d;
+            color: #ffffff;
+            border-color: #4d4d4d;
+        }
 
         .theme-toggle {
             position: fixed;
@@ -244,15 +259,18 @@
   <!-- TradingView Widget END -->
 
 
-
-<form method="post" action="/apply_strategy" class="mb-4">
-    <select name="strategy_id">
-        {% for strategy in strategies %}
-        <option value="{{strategy.id }}">{{strategy.name}}</option> 
-        {% endfor %}
-    </select>
-    <input type="text" name="stock_id" value="{{stock.id}}">
-    <input type="submit" value="Apply Strategy" class="btn btn-primary">
+<form method="post" action="/apply_strategy" class="mb-4 p-3 rounded shadow-sm strategy-form" style="background-color: white;">
+    <div class="mb-3">
+        <label for="strategySelect" class="form-label" style="color: #0b3d91; font-weight: bold;">Select Strategy</label>
+        <div class="d-flex align-items-center">
+            <select name="strategy_id" id="strategySelect" class="form-select" style="width: auto; margin-right: 20px;">
+                {% for strategy in strategies %}
+                <option value="{{strategy.id}}">{{strategy.name}}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary" style="background-color: #0b3d91; border-color: #0b3d91; margin-left: 20px; font-size: 1.1rem;">Apply</button>
+        </div>
+    </div>
 </form>
 
         <div class="stock-table">

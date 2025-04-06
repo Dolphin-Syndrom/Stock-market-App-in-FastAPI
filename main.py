@@ -39,6 +39,48 @@ def index(request: Request):
                order by symbol
             ) where date = ?
             """, (day_before_yesterday.isoformat(),))
+    elif stock_filter == "RSI_overbought":
+        cursor.execute("""
+            SELECT symbol, name, stock_id, rsi_14, date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               where rsi_14 > 70 and date = ?
+               order by symbol
+            """, (day_before_yesterday.isoformat(),))
+    elif stock_filter == "RSI_oversold":
+        cursor.execute("""
+            SELECT symbol, name, stock_id, rsi_14, date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               where rsi_14 < 30 and date = ?
+               order by symbol
+            """, (day_before_yesterday.isoformat(),))
+    elif stock_filter == "above_sma20":
+        cursor.execute("""
+            SELECT symbol, name, stock_id, sma20, date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               where close > sma20 and date = ?
+               order by symbol
+            """, (day_before_yesterday.isoformat(),))
+    elif stock_filter == "below_sma20":
+        cursor.execute("""
+            SELECT symbol, name, stock_id, sma20, date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               where close < sma20 and date = ?
+               order by symbol
+            """, (day_before_yesterday.isoformat(),))
+    elif stock_filter == "above_sma50":
+        cursor.execute("""
+            SELECT symbol, name, stock_id, sma50, date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               where close > sma50 and date = ?
+               order by symbol
+            """, (day_before_yesterday.isoformat(),))
+    elif stock_filter == "below_sma50":
+        cursor.execute("""
+            SELECT symbol, name, stock_id, sma50, date
+               from stock_price join stock on stock.id = stock_price.stock_id
+               where close < sma50 and date = ?
+               order by symbol
+            """, (day_before_yesterday.isoformat(),))
     else:
         cursor.execute("""
                     SELECT id, symbol, name FROM stock ORDER BY symbol 

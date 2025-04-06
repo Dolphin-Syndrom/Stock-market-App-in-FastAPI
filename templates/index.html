@@ -204,7 +204,13 @@
             
             <option {%if request.query_params.filter=='new_closing_highs'%} selected="selected"{%endif%} value="new_closing_highs">New Closing Highs</option>
             <option {%if request.query_params.filter=='new_closing_lows'%} selected="selected"{%endif%} value="new_closing_lows">New Closing Lows</option>
-            </select> 
+            <option {%if request.query_params.filter=='RSI_overbought'%} selected="selected"{%endif%} value="RSI_overbought">RSI Overbought</option>
+            <option {%if request.query_params.filter=='RSI_oversold'%} selected="selected"{%endif%} value="RSI_oversold">RSI Oversold</option>
+            <option {%if request.query_params.filter=='above_sma20'%} selected="selected"{%endif%} value="above_sma20">Above SMA 20</option>
+            <option {%if request.query_params.filter=='below_sma20'%} selected="selected"{%endif%} value="below_sma20">Below SMA 20</option>
+            <option {%if request.query_params.filter=='above_sma50'%} selected="selected"{%endif%} value="above_sma50">Above SMA 50</option>
+            <option {%if request.query_params.filter=='below_sma50'%} selected="selected"{%endif%} value="below_sma50">Below SMA 50</option>  
+        </select> 
             <input type="submit" value="Filter" class="btn btn-primary">
         </form>
 
@@ -228,31 +234,32 @@
                         <td><a href="/stock/{{ stock.symbol }}">{{ stock.name }}</a></td>
                         <td class="price">
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].close %}
-                                {{ indicator_values[stock.symbol].close }}
+                                {{ indicator_values[stock.symbol].close | round(2) }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].rsi_14 %}
-                                {{ indicator_values[stock.symbol].rsi_14 }}
+                                {{ indicator_values[stock.symbol].rsi_14 | round(2) }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].sma20 %}
-                                {{ indicator_values[stock.symbol].sma20 }}
+                                {{ indicator_values[stock.symbol].sma20 | round(2) }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if stock.symbol in indicator_values and indicator_values[stock.symbol].sma50 %}
-                                {{ indicator_values[stock.symbol].sma50 }}
+                                {{ indicator_values[stock.symbol].sma50 | round(2) }}
                             {% else %}
                                 -
                             {% endif %}
+                        </td>
                         </td>
                     </tr>
                     {% endfor %}
