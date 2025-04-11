@@ -3,7 +3,7 @@
     
     <div class="container stock-container">
         <div class="stock-header">
-            <h1>Stock Market Dashboard</h1>
+            <h1>StockMatrix Analysis</h1>
             <p class="lead">stock market data and analytics</p>
         </div>
         
@@ -19,9 +19,21 @@
             <option {%if request.query_params.filter=='below_sma20'%} selected="selected"{%endif%} value="below_sma20">Below SMA 20</option>
             <option {%if request.query_params.filter=='above_sma50'%} selected="selected"{%endif%} value="above_sma50">Above SMA 50</option>
             <option {%if request.query_params.filter=='below_sma50'%} selected="selected"{%endif%} value="below_sma50">Below SMA 50</option>  
-        </select> 
+        </select>
             <input type="submit" value="Filter" class="btn btn-primary">
         </form>
+
+        <!-- Filter status information -->
+        {% if filter %}
+        <div class="row mb-3">
+            <div class="col">
+                <div class="alert alert-info">
+                    Showing results for filter: <strong>{{ filter }}</strong> using data from: <strong>{{ date }}</strong>
+                    ({{ stocks|length }} stocks found)
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <div class="stock-table">
             <table class="table">
@@ -77,25 +89,4 @@
             </table>
         </div>
     </div>
-    <script>
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            
-            // Save preference
-            const isDarkMode = body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-        }
-
-        // Check for saved theme preference
-        window.addEventListener('load', () => {
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (isDarkMode) {
-                document.body.classList.add('dark-mode');
-            }
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
 {% endblock %}

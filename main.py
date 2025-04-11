@@ -20,8 +20,19 @@ def index(request: Request):
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
     
-    # Define day_before_yesterday at the beginning of the function
-    day_before_yesterday = date.today() - timedelta(days=2)
+    # Get the latest date available in the database
+    cursor.execute("""
+        SELECT date FROM stock_price
+        ORDER BY date DESC
+        LIMIT 1
+    """)
+    latest_date_row = cursor.fetchone()
+    
+    if not latest_date_row:
+        return templates.TemplateResponse("index.html", {"request": request, "stocks": [], "indicator_values": {}, "error": "No stock data available"})
+    
+    latest_date = latest_date_row['date']
+    print(f"Using latest date for filtering: {latest_date}")
 
     if stock_filter == "new_closing_highs":
         cursor.execute("""
@@ -31,7 +42,8 @@ def index(request: Request):
                group by stock_id
                order by symbol
             ) where date = ?
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
+        
     elif stock_filter == "new_closing_lows":
         cursor.execute("""
             select * from(
@@ -40,73 +52,67 @@ def index(request: Request):
                group by stock_id
                order by symbol
             ) where date = ?
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
+        
     elif stock_filter == "RSI_overbought":
         cursor.execute("""
             SELECT symbol, name, stock_id, rsi_14, date
                from stock_price join stock on stock.id = stock_price.stock_id
                where rsi_14 > 70 and date = ?
                order by symbol
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
+        
     elif stock_filter == "RSI_oversold":
         cursor.execute("""
             SELECT symbol, name, stock_id, rsi_14, date
                from stock_price join stock on stock.id = stock_price.stock_id
                where rsi_14 < 30 and date = ?
                order by symbol
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
+        
     elif stock_filter == "above_sma20":
         cursor.execute("""
             SELECT symbol, name, stock_id, sma20, date
                from stock_price join stock on stock.id = stock_price.stock_id
                where close > sma20 and date = ?
                order by symbol
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
     elif stock_filter == "below_sma20":
         cursor.execute("""
             SELECT symbol, name, stock_id, sma20, date
                from stock_price join stock on stock.id = stock_price.stock_id
                where close < sma20 and date = ?
                order by symbol
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
     elif stock_filter == "above_sma50":
         cursor.execute("""
             SELECT symbol, name, stock_id, sma50, date
                from stock_price join stock on stock.id = stock_price.stock_id
                where close > sma50 and date = ?
                order by symbol
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
     elif stock_filter == "below_sma50":
         cursor.execute("""
             SELECT symbol, name, stock_id, sma50, date
                from stock_price join stock on stock.id = stock_price.stock_id
                where close < sma50 and date = ?
                order by symbol
-            """, (day_before_yesterday.isoformat(),))
+            """, (latest_date,))
     else:
         cursor.execute("""
                     SELECT id, symbol, name FROM stock ORDER BY symbol 
                     """)
         
     rows = cursor.fetchall()
-    
-    cursor.execute("""
-        SELECT date FROM stock_price
-        ORDER BY date DESC
-        LIMIT 1
-    """)
-    latest_date = cursor.fetchone()
-    
-    query_date = latest_date['date'] if latest_date else day_before_yesterday.isoformat()
-    
+    print(f"Filter: {stock_filter}, Records found: {len(rows)}")
 
+    # Query for indicator values using the latest date
     cursor.execute("""
-        SELECT sp.stock_id, s.symbol, sp.rsi_14, sp.sma20, sp.sma50, sp.close 
-        FROM stock_price sp
-        JOIN stock s ON sp.stock_id = s.id
-        WHERE sp.date = ?
-    """, (query_date,))
-
+        SELECT stock_id, symbol, rsi_14, sma20, sma50, close 
+        FROM stock_price JOIN stock ON stock.id = stock_price.stock_id
+        WHERE date = ?
+    """, (latest_date,))
+    
     indicator_rows = cursor.fetchall()
     
     indicator_values = {}
@@ -120,7 +126,13 @@ def index(request: Request):
 
     print(f"Found {len(indicator_values)} stocks with indicator values")
 
-    return templates.TemplateResponse("index.html", {"request": request, "stocks": rows, "indicator_values": indicator_values})
+    return templates.TemplateResponse("index.html", {
+        "request": request, 
+        "stocks": rows, 
+        "indicator_values": indicator_values,
+        "filter": stock_filter,
+        "date": latest_date
+    })
 
 @app.get("/stock/{symbol}")
 def stock_detail(request: Request, symbol: str):
@@ -151,19 +163,6 @@ def stock_detail(request: Request, symbol: str):
 
     return templates.TemplateResponse("stock_detail.html", {"request": request, "stock": stock, "prices": prices, "strategies": strategies})
 
-
-@app.post("/apply_strategy")
-def apply_strategy(strategy_id: int = Form(...), stock_id: int = Form(...)):
-    connection = sqlite3.connect(config.DB_FILE)
-    cursor = connection.cursor()
-
-    cursor.execute("""
-                INSERT INTO strategy_stock (stock_id, strategy_id) VALUES (?, ?)
-                """, (stock_id, strategy_id))
-
-    connection.commit()
-
-    return RedirectResponse(url=f"/strategy/{strategy_id}", status_code=303)
 
 @app.get("/strategies")
 def strategies(request: Request):
@@ -237,17 +236,32 @@ def financial_advice(query: FinancialQuery):
 @app.get("/ai-agent")
 def ai_agent_page(request: Request):
     return templates.TemplateResponse("ai-agent.html", {"request": request})
+app.include_router(router)
 
+@app.post("/apply_strategy")
+def apply_strategy(strategy_id: int = Form(...), stock_id: int = Form(...)):
+ 
+    connection = sqlite3.connect(config.DB_FILE)
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+                INSERT INTO strategy_stock (stock_id, strategy_id) VALUES (?, ?)
+                """, (stock_id, strategy_id))
+ 
+    connection.commit()
+
+    return RedirectResponse(url=f"/strategy/{strategy_id}", status_code=303)
+ 
 @app.get("/strategy/{strategy_id}")
 def strategy(request: Request, strategy_id):
     connection = sqlite3.connect(config.DB_FILE)
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-
+ 
     cursor.execute("""
                 SELECT id, name FROM strategy WHERE id = ?
                 """, (strategy_id,))
-
     strategy = cursor.fetchone()
 
     cursor.execute("""
@@ -260,4 +274,3 @@ def strategy(request: Request, strategy_id):
 
     return templates.TemplateResponse("strategy.html", {"request": request, "strategy": strategy, "stocks": stocks})
 
-app.include_router(router)

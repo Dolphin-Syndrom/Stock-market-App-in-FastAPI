@@ -15,8 +15,8 @@
         }
         
         body.dark-mode {
-            background-color: #1a1a1a;
-            color: #ffffff;
+            background-color: #121212;
+            color: #f0f0f0;
         }
         
         /* Navbar styles */
@@ -24,6 +24,10 @@
             background-color: #0b3d91;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 0.8rem 1rem;
+        }
+        
+        body.dark-mode .navbar {
+            background-color: #1f1f1f !important;
         }
         
         .navbar-brand {
@@ -90,15 +94,28 @@
             box-shadow: 0 2px 15px rgba(11, 61, 145, 0.1);
         }
         
+        body.dark-mode .stock-header {
+            color: #66b3ff;
+            background: #1f1f1f;
+        }
+        
         .stock-symbol {
             color: #0b3d91;
             font-size: 2.5rem;
             font-weight: bold;
         }
         
+        body.dark-mode .stock-symbol {
+            color: #66b3ff;
+        }
+        
         .stock-name {
             color: #666;
             font-size: 1.2rem;
+        }
+        
+        body.dark-mode .stock-name {
+            color: #adadad;
         }
         
         .stock-table {
@@ -108,14 +125,27 @@
             overflow: hidden;
         }
         
+        body.dark-mode .stock-table {
+            background: #1f1f1f;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+        
         /* Table styles */
         .table {
             margin-bottom: 0;
         }
         
+        body.dark-mode .table {
+            color: #f0f0f0;
+        }
+        
         .table thead {
             background-color: #0b3d91;
             color: white;
+        }
+        
+        body.dark-mode .table thead th {
+            border-color: #444;
         }
         
         .table thead th {
@@ -127,9 +157,17 @@
             background-color: rgba(11, 61, 145, 0.05);
         }
         
+        body.dark-mode .table tbody tr:hover {
+            background-color: #3d3d3d;
+        }
+        
         .table tbody td {
             vertical-align: middle;
             padding: 1rem;
+        }
+        
+        body.dark-mode .table tbody td {
+            border-color: #333;
         }
         
         .price-value {
@@ -147,6 +185,10 @@
         
         .back-link:hover {
             color: #1e88e5;
+        }
+        
+        body.dark-mode a {
+            color: #8ab4f8;
         }
         
         /* Theme toggle button */
@@ -168,11 +210,31 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
         
+        .theme-toggle {
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        
         /* Strategy form styles */
         .strategy-form {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 2px 15px rgba(11, 61, 145, 0.1);
+        }
+        
+        body.dark-mode .strategy-form {
+            background-color: #1f1f1f !important;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark-mode .strategy-form label {
+            color: #66b3ff !important;
+        }
+        
+        body.dark-mode .strategy-form select {
+            background-color: #333;
+            color: #f0f0f0;
+            border-color: #444;
         }
         
         /* Card styles for light and dark mode */
@@ -183,9 +245,9 @@
             overflow: hidden;
         }
         
-        .dark-mode .card {
-            background-color: #2d2d2d;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        body.dark-mode .card {
+            background-color: #1f1f1f;
+            border-color: #444;
         }
         
         /* Table header styles for light and dark mode */
@@ -194,82 +256,25 @@
             color: white !important;
         }
         
-        .dark-mode .table-primary {
+        body.dark-mode .table-primary {
             background-color: #1c3a70 !important;
             color: white !important;
         }
         
         /* Badge styles for dark mode */
-        .dark-mode .badge.bg-primary {
+        body.dark-mode .badge.bg-primary {
             background-color: #3a6ac2 !important;
         }
         
         /* Text color for info messages in dark mode */
-        .dark-mode .text-muted {
+        body.dark-mode .text-muted {
             color: #a0a0a0 !important;
         }
         
-        /* Dark mode overrides */
-        .dark-mode .navbar {
-            background-color: #1c1c1c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-        
-        .dark-mode .navbar-brand i {
-            color: #66b3ff;
-        }
-        
-        .dark-mode .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .dark-mode .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .dark-mode .stock-header {
-            color: #66b3ff;
-            background: #2d2d2d;
-        }
-        
-        .dark-mode .stock-name {
-            color: #adadad;
-        }
-        
-        .dark-mode .stock-symbol {
-            color: #66b3ff;
-        }
-        
-        .dark-mode .stock-table {
-            background: #2d2d2d;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .dark-mode .table {
-            color: #ffffff;
-        }
-        
-        .dark-mode .table tbody tr:hover {
-            background-color: #3d3d3d;
-        }
-        
-        .dark-mode a {
-            color: #66b3ff;
-        }
-        
-        .dark-mode .strategy-form {
-            background-color: #2d2d2d !important;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .dark-mode .strategy-form label {
-            color: #66b3ff !important;
-        }
-        
-        .dark-mode .strategy-form select {
-            background-color: #3d3d3d;
-            color: #ffffff;
-            border-color: #4d4d4d;
+        body.dark-mode .alert-info {
+            background-color: #1b3043;
+            color: #8ed4ff;
+            border-color: #204a65;
         }
     </style>
 </head>
@@ -277,7 +282,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-chart-line"></i> Backtester
+                <i class="fas fa-chart-line"></i> StockMatrix
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -312,23 +317,13 @@
             const body = document.body;
             body.classList.toggle('dark-mode');
             
-            // Update icon
-            const themeIcon = document.querySelector('.theme-toggle i');
-            if (body.classList.contains('dark-mode')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-            
-            // Save preference
+            // Save preference to localStorage
             const isDarkMode = body.classList.contains('dark-mode');
             localStorage.setItem('darkMode', isDarkMode);
         }
 
-        // Check for saved theme preference
-        window.addEventListener('load', () => {
+        // Apply saved theme preference as soon as possible
+        (function() {
             const isDarkMode = localStorage.getItem('darkMode') === 'true';
             if (isDarkMode) {
                 document.body.classList.add('dark-mode');
@@ -336,8 +331,10 @@
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
             }
-            
-            // Set active nav link
+        })();
+
+        // Check for saved theme preference
+        window.addEventListener('load', () => {
             const currentPath = window.location.pathname;
             document.querySelectorAll('.nav-link').forEach(link => {
                 if (link.getAttribute('href') === currentPath) {
